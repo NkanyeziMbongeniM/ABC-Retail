@@ -1,0 +1,18 @@
+@model DashboardVm
+@{ ViewData["Title"] = "Dashboard"; }
+<section class="hero">
+  <div><p class="eyebrow">CLDV7112W • PROJECT 1</p><h1>ABC Retail cloud operations</h1><p>A complete ASP.NET Core web application demonstrating Azure Tables, Blob Storage, Queue Storage and Azure Files for a growing online retailer.</p></div>
+  <div class="status @(Model.StorageConnected ? "online" : "offline")"><span></span>@(Model.StorageConnected ? "Azure Storage Connected" : "Storage Not Configured")</div>
+</section>
+@if (!Model.StorageConnected) { <div class="alert warning"><strong>Configuration required:</strong> @Model.StorageMessage</div> }
+<div class="cards">
+ <div class="card"><span>Azure Tables</span><strong>@Model.Customers customers</strong><small>@Model.Products products • @Model.Orders orders</small></div>
+ <div class="card"><span>Blob Storage</span><strong>@Model.Blobs blobs</strong><small>Images & multimedia</small></div>
+ <div class="card"><span>Queue Storage</span><strong>@Model.QueueMessages messages</strong><small>Order & inventory processing</small></div>
+ <div class="card"><span>Azure Files</span><strong>@Model.LogFiles files</strong><small>Application log records</small></div>
+</div>
+<section class="panel" style="margin-top:18px"><h2>Quick actions</h2><div class="actions">
+   <a class="button primary" asp-controller="Customers" asp-action="Index">Customers</a><a class="button" asp-controller="Products" asp-action="Index">Products</a>
+   <a class="button" asp-controller="Orders" asp-action="Index">Create order</a><a class="button" asp-controller="Media" asp-action="Index">Upload media</a>
+   <a class="button" asp-controller="Queue" asp-action="Index">View queue</a><a class="button" asp-controller="Logs" asp-action="Index">View logs</a>
+ </div></section>

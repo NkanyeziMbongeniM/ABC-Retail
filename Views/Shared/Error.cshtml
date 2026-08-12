@@ -1,0 +1,3 @@
+@model ErrorViewModel
+@{ ViewData["Title"] = "Error"; }
+<section class="panel"><p class="eyebrow">APPLICATION ERROR</p><h1>Something went wrong</h1><p class="muted">The application encountered an error while processing the request. Check Azure Storage configuration and App Service logs.</p>@if(Model.ShowRequestId){<p>Request ID: <code>@Model.RequestId</code></p>}<a class="button" asp-controller="Home" asp-action="Index">Back to dashboard</a></section>
