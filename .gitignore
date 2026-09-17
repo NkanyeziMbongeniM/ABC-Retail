@@ -14,9 +14,11 @@ obj/
 ## Local secrets
 appsettings.Local.json
 appsettings.*.Local.json
+local.settings.json
 .env
 .env.*
 
 ## OS
 .DS_Store
 Thumbs.db
+

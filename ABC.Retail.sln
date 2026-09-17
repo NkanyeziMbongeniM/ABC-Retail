@@ -1,8 +1,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.9.12120.119 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Retail", "ABC.Retail.csproj", "{6C7E1B41-0B2A-4E4E-9D88-4B7C1B7A0F10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABC.Retail.Functions", "ABC.Retail.Functions\ABC.Retail.Functions.csproj", "{1929054B-8165-49E1-5A3E-F6F9B5E9F59B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,5 +16,12 @@ Global
 		{6C7E1B41-0B2A-4E4E-9D88-4B7C1B7A0F10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C7E1B41-0B2A-4E4E-9D88-4B7C1B7A0F10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C7E1B41-0B2A-4E4E-9D88-4B7C1B7A0F10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1929054B-8165-49E1-5A3E-F6F9B5E9F59B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1929054B-8165-49E1-5A3E-F6F9B5E9F59B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1929054B-8165-49E1-5A3E-F6F9B5E9F59B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1929054B-8165-49E1-5A3E-F6F9B5E9F59B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
