@@ -7,6 +7,7 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
 });
 builder.Services.AddSingleton<AzureStorageService>();
+builder.Services.AddHttpClient<AzureFunctionClient>();
 
 var app = builder.Build();
 

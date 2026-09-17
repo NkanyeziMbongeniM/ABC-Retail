@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ABC.Retail.Models;
 using ABC.Retail.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -7,12 +8,18 @@ namespace ABC.Retail.Controllers;
 public sealed class OrdersController : Controller
 {
     private readonly AzureStorageService _storage;
-    public OrdersController(AzureStorageService storage) => _storage = storage;
+    private readonly AzureFunctionClient _functions;
 
-    public async Task<IActionResult> Index(CancellationToken cancellationToken) => View(await _storage.GetOrdersAsync(cancellationToken));
+    public OrdersController(AzureStorageService storage, AzureFunctionClient functions)
+    {
+        _storage = storage;
+        _functions = functions;
+    }
+
+    public async Task<IActionResult> Index(CancellationToken cancellationToken) =>
+        View(await _storage.GetOrdersAsync(cancellationToken));
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Order model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid || model.Quantity <= 0 || model.UnitPrice < 0)
@@ -27,8 +34,35 @@ public sealed class OrdersController : Controller
         model.Status = "Queued";
         model.CreatedUtc = DateTime.UtcNow;
 
-        await _storage.AddOrderAsync(model, cancellationToken);
-        TempData["Success"] = "Order stored in Azure Tables. ProcessOrder and UpdateInventory messages were sent to Azure Queue Storage.";
+        if (_functions.IsConfigured)
+        {
+            await _functions.StoreOrderAsync(model, cancellationToken);
+            await _functions.SendQueueTransactionAsync(JsonSerializer.Serialize(new
+            {
+                Type = "ProcessOrder",
+                model.OrderNumber,
+                model.CustomerName,
+                model.ProductName,
+                model.Quantity,
+                model.Total,
+                CreatedUtc = model.CreatedUtc
+            }), cancellationToken);
+            await _functions.SendQueueTransactionAsync(JsonSerializer.Serialize(new
+            {
+                Type = "UpdateInventory",
+                model.OrderNumber,
+                model.ProductName,
+                QuantityToDeduct = model.Quantity
+            }), cancellationToken);
+
+            TempData["Success"] = "Order stored via Azure Table Function and two transaction messages written via Queue Function.";
+        }
+        else
+        {
+            await _storage.AddOrderAsync(model, cancellationToken);
+            TempData["Success"] = "Order stored directly and queue messages created (Function fallback mode).";
+        }
+
         return RedirectToAction(nameof(Index));
     }
 }

@@ -7,12 +7,18 @@ namespace ABC.Retail.Controllers;
 public sealed class CustomersController : Controller
 {
     private readonly AzureStorageService _storage;
-    public CustomersController(AzureStorageService storage) => _storage = storage;
+    private readonly AzureFunctionClient _functions;
 
-    public async Task<IActionResult> Index(CancellationToken cancellationToken) => View(await _storage.GetCustomersAsync(cancellationToken));
+    public CustomersController(AzureStorageService storage, AzureFunctionClient functions)
+    {
+        _storage = storage;
+        _functions = functions;
+    }
+
+    public async Task<IActionResult> Index(CancellationToken cancellationToken) =>
+        View(await _storage.GetCustomersAsync(cancellationToken));
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Customer model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
@@ -20,14 +26,22 @@ public sealed class CustomersController : Controller
             TempData["Error"] = "Please complete all customer fields correctly.";
             return RedirectToAction(nameof(Index));
         }
+
         model.RowKey = Guid.NewGuid().ToString("N");
-        await _storage.AddCustomerAsync(model, cancellationToken);
-        TempData["Success"] = "Customer stored in Azure Table Storage.";
+        if (_functions.IsConfigured)
+        {
+            await _functions.StoreCustomerAsync(model, cancellationToken);
+            TempData["Success"] = "Customer stored in Azure Tables through StoreTableInformation Azure Function.";
+        }
+        else
+        {
+            await _storage.AddCustomerAsync(model, cancellationToken);
+            TempData["Success"] = "Customer stored directly in Azure Tables (Function fallback mode).";
+        }
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
     {
         await _storage.DeleteCustomerAsync(id, cancellationToken);
