@@ -1,0 +1,40 @@
+name: Build and deploy Azure Functions - abcretail-functions-st10369357
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore Azure Functions project
+        run: dotnet restore ./ABC.Retail.Functions/ABC.Retail.Functions.csproj
+
+      - name: Build Azure Functions project
+        run: dotnet build ./ABC.Retail.Functions/ABC.Retail.Functions.csproj --configuration Release --no-restore
+
+      - name: Publish Azure Functions project
+        run: dotnet publish ./ABC.Retail.Functions/ABC.Retail.Functions.csproj --configuration Release --output ./function-publish
+
+      - name: Deploy to Azure Function App
+        uses: Azure/functions-action@v1
+        with:
+          app-name: 'abcretail-functions-st10369357'
+          slot-name: 'Production'
+          package: './function-publish'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_23CABCB6C1614DDDBF346E6DC9A5CE3F }}
